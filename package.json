@@ -1,0 +1,26 @@
+{
+  "name": "aetherion",
+  "version": "0.1.0",
+  "description": "Aetherion — Primordial Soulbound Entity of DiamondWall Ecosystem",
+  "author": "Pablo Ramos Benlloch (PRB)",
+  "license": "MIT",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:coverage": "hardhat coverage",
+    "deploy:testnet": "hardhat run scripts/deploy-aetherion.js --network bscTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy-aetherion.js --network bsc",
+    "verify:testnet": "hardhat verify --network bscTestnet",
+    "verify:mainnet": "hardhat verify --network bsc",
+    "mint:genesis": "hardhat run scripts/mint-genesis.js --network bsc"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "ethers": "^6.11.0"
+  }
+}

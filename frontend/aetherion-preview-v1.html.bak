@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetherion — The Primordial</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Georgia', serif;
+      background: #0F172A;
+      color: #E2E8F0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+    .header {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(180deg, rgba(15,23,42,1) 0%, rgba(15,23,42,0.5) 100%);
+    }
+    .header h1 {
+      font-size: 3rem;
+      letter-spacing: 0.3em;
+      background: linear-gradient(135deg, #06B6D4 0%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #94A3B8;
+      font-style: italic;
+      letter-spacing: 0.1em;
+    }
+    #polyhedron-viewer {
+      width: 100%;
+      height: 500px;
+      background: radial-gradient(circle at center, #1E293B 0%, #0F172A 70%);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 0 60px rgba(6, 182, 212, 0.15);
+      position: relative;
+    }
+    #polyhedron-canvas { width: 100%; height: 100%; }
+    .badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid #06B6D4;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      color: #06B6D4;
+    }
+    .oracle-panel {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 12px;
+      padding: 25px;
+      backdrop-filter: blur(10px);
+    }
+    .oracle-panel h2 {
+      color: #F59E0B;
+      margin-bottom: 15px;
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+    }
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .state-item {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid #06B6D4;
+    }
+    .state-label {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+    .state-value {
+      font-size: 1.1rem;
+      color: #F1F5F9;
+      font-weight: bold;
+    }
+    .prophecy-box {
+      background: rgba(6, 182, 212, 0.08);
+      border-left: 3px solid #F59E0B;
+      padding: 15px;
+      margin: 20px 0;
+      font-style: italic;
+      color: #E2E8F0;
+      border-radius: 4px;
+    }
+    .consult-form { margin-top: 25px; }
+    .consult-form label {
+      display: block;
+      color: #94A3B8;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+    .consult-form select, .consult-form textarea {
+      width: 100%;
+      padding: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 6px;
+      color: #F1F5F9;
+      font-family: inherit;
+      margin-bottom: 15px;
+    }
+    .consult-form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    .consult-form button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: transform 0.2s;
+      text-transform: uppercase;
+    }
+    .consult-form button:hover { transform: translateY(-2px); }
+    .consult-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .response-box {
+      margin-top: 20px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 8px;
+      display: none;
+    }
+    .response-box.show { display: block; }
+    .response-meta {
+      font-size: 0.75rem;
+      color: #64748B;
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .fee-info {
+      color: #F59E0B;
+      font-size: 0.85rem;
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>AETHERION</h1>
+    <p>The Primordial Soulbound Entity of DiamondWall</p>
+  </div>
+
+  <div class="container">
+    <div>
+      <div id="polyhedron-viewer">
+        <div class="badge">LEVEL <span id="lvl-badge">1</span> · AWAKENING</div>
+        <div id="polyhedron-canvas"></div>
+      </div>
+    </div>
+
+    <div class="oracle-panel">
+      <h2>⟡ ECOSYSTEM STATE</h2>
+      <div class="state-grid">
+        <div class="state-item">
+          <div class="state-label">Evolution</div>
+          <div class="state-value" id="s-level">1 / 4</div>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Interactions</div>
+          <div class="state-value" id="s-interactions">0</div>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Current TVL</div>
+          <div class="state-value" id="s-tvl">0 BNB</div>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Days Since Genesis</div>
+          <div class="state-value" id="s-days">0</div>
+        </div>
+      </div>
+
+      <div class="prophecy-box" id="prophecy">
+        "The Aether awakens."
+      </div>
+
+      <div class="consult-form">
+        <h2>⟡ CONSULT THE ENTITY</h2>
+        <label>Interaction Type</label>
+        <select id="itype">
+          <option value="0">Simple Query — 0.0002 BNB</option>
+          <option value="1">Prophecy — 0.001 BNB</option>
+          <option value="2">Revelation — 0.005 BNB</option>
+          <option value="3">Blessing — 0.01 BNB</option>
+          <option value="4">Ritual — 0.03 BNB</option>
+        </select>
+
+        <label>Your Question</label>
+        <textarea id="q-input" placeholder="Speak your question in any language..."></textarea>
+
+        <button id="consult-btn" onclick="consult()">⟡ Invoke Aetherion</button>
+
+        <div class="response-box" id="response-box">
+          <div id="response-text"></div>
+          <div class="response-meta">
+            <span id="response-lang">—</span>
+            <span id="response-time">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const container = document.getElementById('polyhedron-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, container.offsetWidth / 500, 0.1, 1000);
+    camera.position.z = 4;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.offsetWidth, 500);
+    renderer.setClearColor(0x000000, 0);
+    container.appendChild(renderer.domElement);
+
+    // Stellated Dodecahedron (approximated with DodecahedronGeometry stellated via scale)
+    const geo = new THREE.DodecahedronGeometry(1.2, 0);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0x06B6D4,
+      emissive: 0x06B6D4,
+      emissiveIntensity: 0.3,
+      metalness: 0.9,
+      roughness: 0.15,
+      wireframe: false
+    });
+    const dodeca = new THREE.Mesh(geo, mat);
+    scene.add(dodeca);
+
+    // Wireframe overlay (stellated effect)
+    const wireGeo = new THREE.IcosahedronGeometry(1.35, 1);
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0xF59E0B,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.4
+    });
+    const wire = new THREE.Mesh(wireGeo, wireMat);
+    scene.add(wire);
+
+    // Inner icosahedron (core)
+    const coreGeo = new THREE.IcosahedronGeometry(0.7, 0);
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: 0xF59E0B,
+      emissive: 0xF59E0B,
+      emissiveIntensity: 0.6,
+      metalness: 1,
+      roughness: 0
+    });
+    const core = new THREE.Mesh(coreGeo, coreMat);
+    scene.add(core);
+
+    // Particles orbiting
+    const particleCount = 200;
+    const particles = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const r = 2 + Math.random() * 1;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+    }
+    particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0xF59E0B,
+      size: 0.03,
+      transparent: true,
+      opacity: 0.7
+    });
+    scene.add(new THREE.Points(particles, particleMat));
+
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.3);
+    const light1 = new THREE.PointLight(0x06B6D4, 2, 10);
+    light1.position.set(3, 3, 3);
+    const light2 = new THREE.PointLight(0xF59E0B, 1.5, 10);
+    light2.position.set(-3, -3, 2);
+    scene.add(ambient, light1, light2);
+
+    // Animation loop
+    function animate() {
+      requestAnimationFrame(animate);
+      dodeca.rotation.x += 0.003;
+      dodeca.rotation.y += 0.005;
+      wire.rotation.x -= 0.002;
+      wire.rotation.y -= 0.003;
+      core.rotation.x += 0.008;
+      core.rotation.y -= 0.007;
+      // Core pulse
+      const pulse = 1 + 0.15 * Math.sin(Date.now() * 0.002);
+      core.scale.set(pulse, pulse, pulse);
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      const w = container.offsetWidth;
+      camera.aspect = w / 500;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, 500);
+    });
+  </script>
+
+  <script>
+    const API = 'http://localhost:8100';
+
+    async function loadState() {
+      try {
+        const r = await fetch(`${API}/state`);
+        const s = await r.json();
+        document.getElementById('s-level').textContent = `${s.evolution_level} / 4`;
+        document.getElementById('lvl-badge').textContent = s.evolution_level;
+        document.getElementById('s-interactions').textContent = s.interactions;
+        document.getElementById('s-tvl').textContent = `${s.tvl} BNB`;
+        document.getElementById('s-days').textContent = s.days;
+        document.getElementById('prophecy').textContent = `"${s.prophecy}"`;
+      } catch(e) { console.error(e); }
+    }
+
+    async function consult() {
+      const btn = document.getElementById('consult-btn');
+      const q = document.getElementById('q-input').value.trim();
+      if (!q) { alert('Speak your question first.'); return; }
+
+      btn.disabled = true;
+      btn.textContent = '⟡ The Entity awakens...';
+
+      try {
+        const r = await fetch(`${API}/consult`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: q })
+        });
+        const data = await r.json();
+        document.getElementById('response-text').textContent = data.response;
+        document.getElementById('response-lang').textContent = `Language: ${data.language.toUpperCase()}`;
+        document.getElementById('response-time').textContent = `${data.processing_ms}ms`;
+        document.getElementById('response-box').classList.add('show');
+      } catch(e) {
+        alert('The Aether is silent. Check API on port 8100.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⟡ Invoke Aetherion';
+      }
+    }
+    window.consult = consult;
+
+    loadState();
+    setInterval(loadState, 15000);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+# Environment
+.env
+.env.local
+.env.*
+backend/config/secrets.json
+
+# Node
+node_modules/
+package-lock.json
+
+# Hardhat
+cache/
+artifacts/
+coverage/
+coverage.json
+typechain/
+typechain-types/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv
+*.egg-info/
+
+# Telemetry DB (local data)
+backend/ai-service/telemetry.db
+backend/ai-service/telemetry.db-journal
+
+# IPFS local
+.ipfs/
+
+# Blender
+*.blend1
+*.blend2
+art/renders/*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Deployment files (secrets)
+deployments-*.json
+
+# Logs
+*.log
