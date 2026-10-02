@@ -50,3 +50,8 @@ deployments-*.json
 
 # Logs
 *.log
+
+# Deploy logs
+deploy-*.log
+*.log
+tsconfig.json

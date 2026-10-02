@@ -1,4 +1,5 @@
-require("@nomicfoundation/hardhat-toolbox");
+require("@nomicfoundation/hardhat-ethers");
+require("@nomicfoundation/hardhat-verify");
 require("dotenv").config();
 
 const { PRIVATE_KEY, BSCSCAN_API_KEY, RPC_BSC_MAINNET, RPC_BSC_TESTNET } = process.env;
@@ -24,7 +25,7 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: { bsc: BSCSCAN_API_KEY, bscTestnet: BSCSCAN_API_KEY }
+    apiKey: BSCSCAN_API_KEY
   },
   paths: { sources: "./contracts", tests: "./test", cache: "./cache", artifacts: "./artifacts" }
 };

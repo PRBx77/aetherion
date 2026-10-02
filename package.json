@@ -15,12 +15,14 @@
     "mint:genesis": "hardhat run scripts/mint-genesis.js --network bsc"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.1.3",
     "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.17.0",
     "hardhat": "^2.22.0",
-    "dotenv": "^16.3.1"
-  },
-  "dependencies": {
-    "ethers": "^6.11.0"
+    "ts-node": "^10.9.2",
+    "typescript": "^7.0.2"
   }
 }
