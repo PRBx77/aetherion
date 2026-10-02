@@ -6,8 +6,8 @@ import ollama
 from typing import AsyncGenerator
 
 MODEL = "llama3.1:8b"
-TEMPERATURE = 0.8  # Un poco creativo pero controlado
-MAX_TOKENS = 300
+TEMPERATURE = 0.7  # Un poco creativo pero controlado
+MAX_TOKENS = 180
 
 
 async def generate_response(
@@ -28,7 +28,9 @@ async def generate_response(
             "temperature": TEMPERATURE,
             "num_predict": MAX_TOKENS,
             "top_p": 0.9,
-            "repeat_penalty": 1.15
+            "repeat_penalty": 1.15,
+            "num_ctx": 4096,
+            "num_thread": 4
         }
     )
     return response["message"]["content"].strip()

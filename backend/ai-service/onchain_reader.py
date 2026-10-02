@@ -56,7 +56,7 @@ async def get_dwall_stats() -> dict:
             "treasury_bnb": float(w3.from_wei(treasury_bnb, "ether")),
             "presale_bnb_collected": float(w3.from_wei(presale_bnb, "ether"))
         }
-        cache_manager.set("dwall_stats", result, ttl=30)
+        cache_manager.set("dwall_stats", result, ttl=120)
         return result
     except Exception as e:
         return {"error": str(e)}
@@ -156,7 +156,7 @@ async def get_airdrop_stats() -> dict:
             "remaining_slots": max(0, 250 - claims_count),
             "progress_percent": round(claims_count / 250 * 100, 2)
         }
-        cache_manager.set("airdrop_stats", result, ttl=60)
+        cache_manager.set("airdrop_stats", result, ttl=120)
         return result
     except Exception as e:
         return {"error": str(e)}

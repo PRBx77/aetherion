@@ -17,34 +17,65 @@ def build_chart(query: str, live_data: dict) -> dict | None:
     """Devuelve config Chart.js o None si no aplica."""
     q = query.lower()
 
-    # 1. Comparativa precios top cryptos
-    if any(k in q for k in ["precio", "price", "comparar", "compara", "top", "ranking"]):
+    # 1. Comparativa precios top cryptos (triggers ampliados)
+    if any(k in q for k in [
+        "precio", "price", "comparar", "compara", "comparación", "comparison",
+        "top", "ranking", "cuánto vale", "cuanto vale", "cotización", "cotizacion",
+        "mejor", "peor", "versus", "vs", "contra", "frente a", "mercados"
+    ]):
         if "top_cryptos" in live_data:
             return _chart_top_prices(live_data["top_cryptos"])
 
     # 2. Cambios 24h
-    if any(k in q for k in ["24h", "cambio", "change", "sube", "baja", "rojo", "verde"]):
+    if any(k in q for k in [
+        "24h", "24 h", "cambio", "change", "sube", "baja", "subida", "bajada",
+        "rojo", "verde", "red", "green", "gain", "loss", "ganadores", "perdedores",
+        "performance", "rendimiento", "variación", "variacion"
+    ]):
         if "top_cryptos" in live_data:
             return _chart_24h_changes(live_data["top_cryptos"])
 
     # 3. Volúmenes
-    if any(k in q for k in ["volumen", "volume", "trading"]):
+    if any(k in q for k in [
+        "volumen", "volume", "trading", "actividad", "activity",
+        "liquidez", "liquidity", "flujo", "flow", "operaciones"
+    ]):
         if "top_cryptos" in live_data:
             return _chart_volumes(live_data["top_cryptos"])
 
     # 4. Distribución supply DWALL
-    if any(k in q for k in ["supply", "distribuci", "distribution", "tokenomics", "reparto"]):
+    if any(k in q for k in [
+        "supply", "distribuci", "distribution", "tokenomics", "reparto",
+        "allocation", "allocación", "asignación", "piezas", "slices",
+        "tokens repartidos", "token economy", "porcentajes"
+    ]):
         return _chart_dwall_distribution()
 
     # 5. Progreso airdrop
-    if any(k in q for k in ["airdrop", "claim", "wallets", "progreso", "progress"]):
+    if any(k in q for k in [
+        "airdrop", "claim", "wallets", "progreso", "progress",
+        "cuánto llevamos", "cuanto llevamos", "faltan", "quedan",
+        "onboarding", "250", "whitelist"
+    ]):
         if "airdrop" in live_data and "error" not in live_data["airdrop"]:
             return _chart_airdrop_progress(live_data["airdrop"])
 
     # 6. Dominance BTC/ETH
-    if any(k in q for k in ["dominance", "dominancia", "cuota"]):
+    if any(k in q for k in [
+        "dominance", "dominancia", "cuota", "market share",
+        "cuota de mercado", "share", "control", "influencia", "peso"
+    ]):
         if "market_summary" in live_data:
             return _chart_market_dominance(live_data["market_summary"])
+
+    # 7. Fallback: si el usuario pide "muéstrame", "visualiza", "gráfica"
+    #    y hay datos cryptos → mostrar comparativa precios
+    if any(k in q for k in [
+        "muéstrame", "muestrame", "visualiza", "visualize", "gráfica",
+        "grafica", "chart", "graph", "dibuja", "plot", "visualmente"
+    ]):
+        if "top_cryptos" in live_data:
+            return _chart_top_prices(live_data["top_cryptos"])
 
     return None
 
